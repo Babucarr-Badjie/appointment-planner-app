@@ -1,0 +1,77 @@
+.appointment-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+.appointment-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.appointment-form input,
+.appointment-form select {
+  flex: 1 1 180px;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+.appointment-form button {
+  padding: 8px 16px;
+  background: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.appointment-form .cancel-btn {
+  background: #e53e3e;
+}
+.appointment-form button:hover {
+  background: #2563eb;
+}
+.search-bar {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+.appointment-list {
+  list-style: none;
+  padding: 0;
+}
+.appointment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f5f9;
+  margin-bottom: 10px;
+  padding: 12px 10px;
+  border-radius: 6px;
+  color: #2d3748;
+  font-size: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.actions button {
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: none;
+  background: #cbd5e1;
+  color: #2d3748;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.actions button:hover {
+  background: #3182ce;
+  color: #fff;
+}

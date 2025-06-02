@@ -1,14 +1,25 @@
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Contact from "./Components/Contact";
-import Appointment from "./Components/Appointment";
+import Appointments from "./Components/Appointments";
 import "./Styles/App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dashboard from "./Components/Dashboard";
 import Footer from "./Components/Footer";
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [contacts, setContacts] = useState([]);
 
+  // Load contacts from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("contacts");
+    if (stored) setContacts(JSON.parse(stored));
+  }, []);
+
+  // Save contacts to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("contacts", JSON.stringify(contacts));
+  }, [contacts]);
   return (
     <BrowserRouter>
       <div className="app-container">
@@ -36,7 +47,10 @@ function App() {
         {started && (
           <>
             <Route path="/contacts" element={<Contact />} />
-            <Route path="/appointments" element={<Appointment />} />
+            <Route
+              path="/appointments"
+              element={<Appointments contacts={contacts} />}
+            />
             <Route path="'*" element={<Navigate to="/contact" />} />
           </>
         )}
