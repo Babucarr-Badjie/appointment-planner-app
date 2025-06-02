@@ -1,161 +1,153 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "../Styles/Appointments.css";
 
-export default function Appointments({ contacts }) {
-  const [appointments, setAppointments] = useState([]);
-  const [newAppointment, setNewAppointment] = useState({
-    title: "",
+export default function Appointments({ appointments, setAppointments }) {
+  // const { appointments, setAppointments } = props;
+  const [searchAppointments, setSearchAppointments] = useState("");
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
     date: "",
     time: "",
-    contact: "",
   });
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [searchAppointments, setSearchAppointments] = useState("");
 
-  // Load appointments from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("appointments");
-    if (stored) setAppointments(JSON.parse(stored));
-  }, []);
-
-  // Save appointments to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("appointments", JSON.stringify(appointments));
-  }, [appointments]);
-
-  // Validation helper
-  const isDuplicate = (appt) =>
-    appointments.some(
-      (appointment, appointmentIndex) =>
-        appointmentIndex !== editingIndex &&
-        appointment.title === appt.title &&
-        appointment.date === appt.date &&
-        appointment.time === appt.time &&
-        appointment.contact === appt.contact
-    );
-
-  // Add or update appointment
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { title, date, time, contact } = newAppointment;
-    if (!title || !date || !time || !contact) {
-      alert("Please fill in all fields.");
-      return;
-    }
-    if (isDuplicate(newAppointment)) {
-      alert("This appointment already exists.");
-      return;
-    }
-    if (editingIndex !== null) {
-      // Edit mode
-      const updated = [...appointments];
-      updated[editingIndex] = newAppointment;
-      setAppointments(updated);
-      setEditingIndex(null);
-    } else {
-      // Add mode
-      setAppointments([...appointments, newAppointment]);
-    }
-    setNewAppointment({ title: "", date: "", time: "", contact: "" });
-  };
-
-  // Edit appointment
+  const filtered = appointments.filter(
+    (appointment) =>
+      appointment.name
+        .toLowerCase()
+        .includes(searchAppointments.toLowerCase()) ||
+      appointment.phone.includes(searchAppointments)
+  );
   const handleEdit = (index) => {
-    setNewAppointment(appointments[index]);
     setEditingIndex(index);
+    setEditForm({ ...appointments[index] });
   };
 
-  // Delete appointment
-  const handleDelete = (index) => {
+  // update appointment
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    if (
+      !editForm.name ||
+      !editForm.phone ||
+      !editForm.email ||
+      !editForm.date ||
+      !editForm.time
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
+    const updatedAppointments = [...appointments];
+    updatedAppointments[editingIndex] = editForm;
+    setAppointments(updatedAppointments);
+    setEditingIndex(null);
+    setEditForm({
+      name: "",
+      phone: "",
+      email: "",
+      date: "",
+      time: "",
+    });
+    alert("Appointment updated!");
+  };
+
+  // delete appointment
+  const handleDelete = (idx) => {
     if (window.confirm("Delete this appointment?")) {
-      setAppointments(appointments.filter((_, i) => i !== index));
-      if (editingIndex === index) {
-        setNewAppointment({ title: "", date: "", time: "", contact: "" });
+      setAppointments(appointments.filter((_, i) => i !== idx));
+      if (editingIndex === idx) {
         setEditingIndex(null);
+        setEditForm({ name: "", phone: "", email: "", date: "", time: "" });
       }
     }
   };
 
-  // Filtered appointments
-  const filteredAppointments = appointments.filter(
-    (appointment) =>
-      appointment.title
-        .toLowerCase()
-        .includes(searchAppointments.toLowerCase()) ||
-      appointment.contact
-        .toLowerCase()
-        .includes(searchAppointments.toLowerCase())
-  );
-
   return (
-    <div className="appointment-container">
-      <h1>Appointments</h1>
-      <form className="appointment-form" onSubmit={handleSubmit}>
-        <input
-          type="date"
-          value={newAppointment.date}
-          onChange={(e) =>
-            setNewAppointment({ ...newAppointment, date: e.target.value })
-          }
-        />
-        <input
-          type="time"
-          value={newAppointment.time}
-          onChange={(e) =>
-            setNewAppointment({ ...newAppointment, time: e.target.value })
-          }
-        />
-        <select
-          value={newAppointment.contact}
-          onChange={(e) =>
-            setNewAppointment({ ...newAppointment, contact: e.target.value })
-          }
-        >
-          <option value="">Select Contact</option>
-          {contacts.map((contact, contactIndex) => (
-            <option key={contactIndex} value={contact.name}>
-              {contact.name}
-            </option>
-          ))}
-        </select>
-        <button type="submit">
-          {editingIndex !== null ? "Update" : "Add"}
-        </button>
-        {editingIndex !== null && (
-          <button
-            type="button"
-            className="cancel-btn"
-            onClick={() => {
-              setNewAppointment({ title: "", date: "", time: "", contact: "" });
-              setEditingIndex(null);
-            }}
-          >
-            Cancel
-          </button>
-        )}
-      </form>
-
+    <div className="appointments-container">
+      <h1>All Appointments</h1>
       <input
         className="search-bar"
         type="text"
-        placeholder="Search by title or contact"
+        placeholder="Search by name or phone"
         value={searchAppointments}
         onChange={(e) => setSearchAppointments(e.target.value)}
       />
-
       <ul className="appointment-list">
-        {filteredAppointments.length === 0 && <li>No appointments found.</li>}
-        {filteredAppointments.map((appt, idx) => (
-          <li key={idx} className="appointment-item">
-            <div>
-              <strong>{appt.title}</strong> <br />
-              {appt.date} {appt.time} <br />
-              <span>Contact: {appt.contact}</span>
-            </div>
-            <div className="actions">
-              <button onClick={() => handleEdit(idx)}>Edit</button>
-              <button onClick={() => handleDelete(idx)}>Delete</button>
-            </div>
+        {filtered.length === 0 && <li>No appointments found.</li>}
+        {filtered.map((appointment, appointmentIndex) => (
+          <li key={appointmentIndex} className="appointment-item">
+            {editingIndex === appointmentIndex ? (
+              <form className="edit-form" onSubmit={handleUpdate}>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={editForm.name}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Phone"
+                  value={editForm.phone}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, phone: e.target.value })
+                  }
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={editForm.email}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, email: e.target.value })
+                  }
+                />
+                <input
+                  type="date"
+                  value={editForm.date}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, date: e.target.value })
+                  }
+                />
+                <input
+                  type="time"
+                  value={editForm.time}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, time: e.target.value })
+                  }
+                />
+                <button type="submit">Update</button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setEditingIndex(null)}
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <div>
+                <strong>{appointment.name}</strong> <br />
+                {appointment.phone} <br />
+                {appointment.email} <br />
+                {appointment.date} at {appointment.time} <br />
+                <div className="action-bts">
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEdit(appointmentIndex)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(appointmentIndex)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
           </li>
         ))}
       </ul>
