@@ -11,27 +11,35 @@ function App() {
   const [appointments, setAppointments] = useState([]);
   const [contacts, setContacts] = useState([]);
 
+  // storage key for appointments
+  const APPOINTMENTS_STORAGE_KEY = "appointments";
+
   // Load appointments from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem("appointments");
+    const stored = localStorage.getItem(APPOINTMENTS_STORAGE_KEY);
     if (stored) setAppointments(JSON.parse(stored));
   }, []);
 
   // Save appointments to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("appointments", JSON.stringify(appointments));
+    localStorage.setItem(
+      APPOINTMENTS_STORAGE_KEY,
+      JSON.stringify(appointments)
+    );
     console.log("Appointments state:", appointments);
   }, [appointments]);
 
+  // storage key for contacts
+  const CONTACTS_STORAGE_KEY = "contacts";
   // Load contacts from localStorage on mount
   useEffect(() => {
-    const storedContacts = localStorage.getItem("contacts");
+    const storedContacts = localStorage.getItem(CONTACTS_STORAGE_KEY);
     if (storedContacts) setContacts(JSON.parse(storedContacts));
   }, []);
 
   // Save contacts to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("contacts", JSON.stringify(contacts));
+    localStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(contacts));
   }, [contacts]);
 
   return (
